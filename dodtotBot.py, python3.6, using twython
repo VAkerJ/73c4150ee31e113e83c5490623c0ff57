@@ -17,11 +17,11 @@ class twittStream(TwythonStreamer):
 	def on_success(self, data): 
 		if 'text' in data:
 			tweet = (data['text'])
-#     Couldnt find comman to only stream tweets
+#			Couldnt find command to only stream tweets
 			if tweet[:2] != 'RT' and tweet[0] != '@':
 				lCaseTW = tweet.lower()
 				convTweet = ("")
-#       lazy fix
+#				lazy fix
 				tweet = tweet + " "
 				for letter in range(len(lCaseTW)):
 					if lCaseTW[letter] in {"q", "w", "r", "t", "p", "s", "d", "f", "g", "h", "j", "k", "l", "z", "x", "c", "v", "b", "n", "m"}:
@@ -31,7 +31,7 @@ class twittStream(TwythonStreamer):
 						       	convTweet = convTweet + tweet[letter] + "O" + tweet[letter]
 					else:
 						convTweet = convTweet + tweet[letter]
-#       Sends the text using a maximum of 3 tweets
+#       			Sends the text using a maximum of 3 tweets
 				if len(convTweet) > 140:
 					lttr = 140
 					while (convTweet[lttr] != " " and lttr > 0):
