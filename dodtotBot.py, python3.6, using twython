@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+from twython import Twython, TwythonError
+from twython import TwythonStreamer
+
+#trumps id
+userN = '25073877'
+
+apiKey = ''
+apiSecret = ''
+accessToken = ''
+accessTokenSecret = ''
+
+twitterApi = Twython(apiKey,apiSecret,accessToken,accessTokenSecret)
+
+
+class twittStream(TwythonStreamer):
+	def on_success(self, data): 
+		if 'text' in data:
+			tweet = (data['text'])
+#     Couldnt find comman to only stream tweets
+			if tweet[:2] != 'RT' and tweet[0] != '@':
+				lCaseTW = tweet.lower()
+				convTweet = ("")
+#       lazy fix
+				tweet = tweet + " "
+				for letter in range(len(lCaseTW)):
+					if lCaseTW[letter] in {"q", "w", "r", "t", "p", "s", "d", "f", "g", "h", "j", "k", "l", "z", "x", "c", "v", "b", "n", "m"}:
+						if tweet[letter].islower() or tweet[letter + 1].islower():
+						       	convTweet = convTweet + tweet[letter] + "o" + tweet[letter].lower()
+						else:
+						       	convTweet = convTweet + tweet[letter] + "O" + tweet[letter]
+					else:
+						convTweet = convTweet + tweet[letter]
+#       Sends the text using a maximum of 3 tweets
+				if len(convTweet) > 140:
+					lttr = 140
+					while (convTweet[lttr] != " " and lttr > 0):
+						lttr -= 1
+
+					if (len(convTweet)-lttr) > 280:
+						twitterApi.update_status(status= convTweet[:140])
+						time.sleep(0.5)
+						twitterApi.update_status(status= convTweet[140:280])
+						time.sleep(0.5)
+						twitterApi.update_status(status= convTweet[280:])
+					else:
+						twitterApi.update_status(status= convTweet[:lttr])
+						time.sleep(0.5)
+						if (len(convTweet)-lttr) > 140:
+							lttrT = lttr + 140
+							while convTweet[lttrT]!= " " and lttrT > lttr:
+								lttrT -= 1
+							if (len(convTweet)-lttrT) > 140:
+								twitterApi.update_status(status= convTweet[lttr:(lttr+140)])
+								time.sleep(0.5)
+								twitterApi.update_status(status= convTweet[:(lttr+140)])
+							else:
+								twitterApi.update_status(status= convTweet[lttr:lttrT])
+								time.sleep(0.5)
+								twitterApi.update_status(status= convTweet[lttrT:])
+						else:
+							twitterApi.update_status(status= convTweet[lttr:])
+				else:
+					twitterApi.update_status(status= convTweet)
+
+	def on_error(self, status_code, data):
+		print ("error haha")
+		print(status_code, data)
+
+while True:
+	try:
+		stream = twittStream(apiKey, apiSecret, accessToken, accessTokenSecret)
+		print ("running")
+		stream.statuses.filter(follow=userN)
+	except:
+		print ("streaming too much data")
+		time.sleep(5.0)
