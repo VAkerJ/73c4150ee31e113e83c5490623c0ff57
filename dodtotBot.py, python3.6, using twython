@@ -66,6 +66,7 @@ class twittStream(TwythonStreamer):
 	def on_error(self, status_code, data):
 		print ("error haha")
 		print(status_code, data)
+		time.sleep(5.0)
 
 while True:
 	try:
